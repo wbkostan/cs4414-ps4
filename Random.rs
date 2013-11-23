@@ -1,12 +1,28 @@
-mod Random;
+static RAND_MAX:uint = 4294967295; //max unsigned 32 bit integer
 
-const RAND_MAX:uint = 4294967295 //max unsigned 32 bit integer
+#[cfg(target_os = "win32")]
+fn getOSEntropy() -> Option<uint>{
+	let mut retVal = None;
+	retVal = Some(5);
+	return retVal;
+}
+
+#[cfg(target_os = "linux")]
+#[cfg(target_os = "macos")]
+fn getOSEntropy() -> Option<uint>{
+	let mut retVal = None;
+	retVal = Some(3);
+	return retVal;
+}
 
 /*Returns a truly random integer value between 0 and RAND_MAX*/
-pub fn rand() -> uint{
-	/*Read some values from /dev/random*/
-	/*XOR some values with results of RdRand or similar*/
-		/*Use some inline assembly to call RdRand*/
-		/*Make sure we try to read until we get success*/
-	/*Return our random value*/
+pub fn rand() -> Option<uint>{
+	let mut retVal = None;
+	retVal = getOSEntropy();
+	return retVal;
+}
+
+fn main() {
+	let num = rand();
+	println(num.unwrap().to_str());
 }
