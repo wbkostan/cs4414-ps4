@@ -25,16 +25,21 @@ fn getOSEntropy() -> Option<uint>{
 		let context : *c_void = malloc(8 as size_t) as *c_void; //size of context
 		let n : *c_void = null();
 		let res1 = CryptAcquireContextW(context, n, n, 1 as c_ulong, 0);
-		if(!res1){println("Context bailed");return Some(GetLastError() as uint);}
+		if(!res1){
+			let error = Some(GetLastError() as uint);
+			println("Context bailed");
+			return error;
+		}
 		
 		let ptr: *c_void = malloc(8 as size_t) as *c_void;
 		let res2 = CryptGenRandom(context, 8 as c_ulong, ptr);
 		if(!res2){
+			let error = Some(GetLastError() as uint);
 			free(ptr);
 			CryptReleaseContext(context, 0);
 			free(context);
 			println("Couldn't Gen");
-			return Some(ptr as uint);
+			return error;
 		}
 		else{
 			let package = Some((ptr as uint));
