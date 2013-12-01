@@ -6,7 +6,16 @@ use std::ptr::null;
 
 #[cfg(target_os = "linux")]
 #[cfg(target_os = "macos")]
-use std::{path::Path, rt::io};
+use std::rt::io;
+
+#[cfg(target_os = "linux")]
+#[cfg(target_os = "macos")]
+use std::path::Path;
+
+#[cfg(target_os = "linux")]
+#[cfg(target_os = "macos")]
+use std::rt::io::file::{FileInfo, FileReader};
+
 
 #[cfg(target_os = "win32", target_arch = "x86")]
 #[link_name = "crypt32"]
@@ -60,7 +69,7 @@ fn getOSEntropy() -> uint{
 pub fn getOSEntropy() -> uint{
 	let mut mem : ~[u8] = ~[1,1,1,1];
 	
-	let f = path::Path("/dev/random");
+	let f = &Path("/dev/random");
 	if f.exists() {
 		let reader = f.open_reader(io::Open);
 		reader.unwrap().read(mem);
@@ -87,5 +96,9 @@ pub fn wrand() -> uint{
 fn main() {
 	let wnum = wrand();
 	let snum = srand();
-	println(num.to_str());
+	println(wnum.to_str());
+	if snum.is_some(){
+		println(snum.unwrap().to_str());
+	}
+	else{println("None");}
 }
