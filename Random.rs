@@ -4,6 +4,10 @@ use std::libc::{c_void, c_ulong, size_t, malloc, free};
 #[cfg(target_os = "win32")]
 use std::ptr::null;
 
+#[cfg(target_os = "linux")]
+#[cfg(target_os = "macos")]
+use std::{path::Path, rt::io};
+
 #[cfg(target_os = "win32", target_arch = "x86")]
 #[link_name = "crypt32"]
 extern "stdcall" {
@@ -56,7 +60,11 @@ fn getOSEntropy() -> uint{
 pub fn getOSEntropy() -> uint{
 	let mut mem : ~[u8] = ~[1,1,1,1];
 	
-	/* Read from file to mem */
+	let f = path::Path("/dev/random");
+	if f.exists() {
+		let reader = f.open_reader(io::Open);
+		reader.unwrap().read(mem);
+	}
 	
 	let mut res : u32 = 0;
 	for val in mem.iter(){
@@ -77,6 +85,7 @@ pub fn wrand() -> uint{
 }
 
 fn main() {
-	let num = wrand();
+	let wnum = wrand();
+	let snum = srand();
 	println(num.to_str());
 }
