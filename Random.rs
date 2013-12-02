@@ -3,6 +3,8 @@ use std::libc::{c_void, c_ulong, size_t, malloc, free};
 
 #[cfg(target_os = "win32")]
 use std::ptr::null;
+use std::io::file_reader;
+use std::path;
 
 #[cfg(target_os = "linux")]
 #[cfg(target_os = "macos")]
@@ -10,7 +12,8 @@ use std::rt::io;
 
 #[cfg(target_os = "linux")]
 #[cfg(target_os = "macos")]
-use std::path::Path;
+use std::io::file_reader;
+use std::path;
 
 #[cfg(target_os = "linux")]
 #[cfg(target_os = "macos")]
@@ -69,10 +72,18 @@ fn getOSEntropy() -> uint{
 pub fn getOSEntropy() -> uint{
 	let mut mem : ~[u8] = ~[1,1,1,1];
 	
-	let f = &Path("/dev/random");
-	if f.exists() {
-		let reader = f.open_reader(io::Open);
-		reader.unwrap().read(mem);
+	let filepath: ~str = ~"/dev/random";
+	
+	let read_result: Result<@Reader, ~str>;
+	read_result = file_reader(~path::Path(filepath.to_owned()));
+	
+	match read_result {
+		Ok(file) => {
+			file.read(mem, 4);
+		},
+		Err(e) => {
+			println(fmt!("Error reading file: %?", e));
+		}
 	}
 	
 	let mut res : u32 = 0;
