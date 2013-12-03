@@ -94,8 +94,15 @@ pub fn getOSEntropy() -> uint{
 }
 
 /*Returns a truly random integer value between 0 and RAND_MAX*/
-pub fn srand() -> Option<uint>{
-	return None;
+/*Returns 0 if rdrand fails to supply a number*/
+pub fn srand() -> uint{
+	let mut rand = 0;
+    	unsafe {
+        	asm!("rdrand %eax"
+             	: "=r"(c)
+             	);
+    	}
+    return rand;
 }
 
 pub fn wrand() -> uint{
