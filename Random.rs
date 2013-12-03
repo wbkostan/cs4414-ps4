@@ -16,6 +16,7 @@ use std::io::file_reader;
 use std::path;
 
 use extra::{bigint, time};
+use std::{rand};
 
 
 #[cfg(target_os = "win32", target_arch = "x86")]
@@ -138,7 +139,7 @@ static BITCOUNT: uint = 64;
 
 fn main() {
 	let mut i = THRESHHOLD;
-	let mut avg_times: ~[bigint::BigUint] = ~[bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0)];
+	let mut avg_times: ~[bigint::BigUint] = ~[bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0)];
 
 	while (i != 0){
 		/* take timings */
@@ -151,12 +152,15 @@ fn main() {
 		let t4 = time::precise_time_ns();
 		let snumn = srandN(BITCOUNT);
 		let t5 = time::precise_time_ns();
+		let bench1: uint = rand::random();
+		let t6 = time::precise_time_ns();
 		
 		/*add to running sums*/
 		avg_times[0] = avg_times[0] + bigint::BigUint::from_uint((t2 - t1) as uint);
 		avg_times[1] = avg_times[1] + bigint::BigUint::from_uint((t3 - t2) as uint);
 		avg_times[2] = avg_times[2] + bigint::BigUint::from_uint((t4 - t3) as uint);
 		avg_times[3] = avg_times[3] + bigint::BigUint::from_uint((t5 - t4) as uint);
+		avg_times[4] = avg_times[4] + bigint::BigUint::from_uint((t6 - t5) as uint);
 		
 		i -= 1;
 	}
@@ -170,4 +174,6 @@ fn main() {
 	println("Average time for 32-bit strong random: " + avg_times[1].to_str());
 	println("Average time for " + BITCOUNT.to_str() + "-bit weak random: " + avg_times[2].to_str());
 	println("Average time for " + BITCOUNT.to_str() + "-bit strong random: " + avg_times[3].to_str());
+	println("Benchmark for 32-bit random: " + avg_times[4].to_str());
+	println("Benchmark for " + BITCOUNT.to_str() + "-bit random: N/A (in Rust)");
 }
