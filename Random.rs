@@ -98,12 +98,13 @@ pub fn getOSEntropy() -> uint{
 /*Returns 0 if rdrand fails to supply a number*/
 pub fn srand() -> uint{
 	let mut rand = 0;
-    	unsafe {
-        	asm!("rdrand %eax"
-             	: "=r"(c)
+	/*
+	unsafe {
+       		asm!("rdrand %eax"
+             		: "=r"(c)
              	);
-    	}
-    return rand;
+    	}*/
+    	return rand;
 }
 
 pub fn wrand() -> uint{
@@ -128,7 +129,9 @@ pub fn srandN(n: uint) -> Option<bigint::BigUint>{
 	let mut big_digs: ~[bigint::BigDigit] = ~[];
 	while (iterations != 0){
 		let num = srand();
-		match num{
+		let mut res = Some(num);
+		if(num == 0){res = None;}
+		match res{
 			Some(x) => {
 					let digs = bigint::BigDigit::from_uint(x);
 					big_digs.push(digs.first());
@@ -148,6 +151,8 @@ fn main() {
 	let mut i = THRESHHOLD;
 	let mut avg_times: ~[bigint::BigUint] = ~[bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0)];
 
+	let mut fail = false;
+
 	while (i != 0){
 		/* take timings */
 		let t1 = time::precise_time_ns();
@@ -162,6 +167,8 @@ fn main() {
 		let bench1: uint = rand::random();
 		let t6 = time::precise_time_ns();
 		
+		if(snum == 0 || snumn.is_none()){fail = true;}
+
 		/*add to running sums*/
 		avg_times[0] = avg_times[0] + bigint::BigUint::from_uint((t2 - t1) as uint);
 		avg_times[1] = avg_times[1] + bigint::BigUint::from_uint((t3 - t2) as uint);
@@ -178,9 +185,11 @@ fn main() {
 	
 	println("Averages over " + THRESHHOLD.to_str() + " iterations:");
 	println("Average time for 32-bit weak random: " + avg_times[0].to_str());
-	println("Average time for 32-bit strong random: " + avg_times[1].to_str());
+	if(!fail){println("Average time for 32-bit strong random: " + avg_times[1].to_str());}
+	else{println("Average time for 32-bit strong random: N/A");}
 	println("Average time for " + BITCOUNT.to_str() + "-bit weak random: " + avg_times[2].to_str());
-	println("Average time for " + BITCOUNT.to_str() + "-bit strong random: " + avg_times[3].to_str());
+	if(!fail){println("Average time for " + BITCOUNT.to_str() + "-bit strong random: " + avg_times[3].to_str());}
+	else{println("Average time for " + BITCOUNT.to_str() + "-bit strong random: N/A");}
 	println("Benchmark for 32-bit random: " + avg_times[4].to_str());
 	println("Benchmark for " + BITCOUNT.to_str() + "-bit random: N/A (in Rust)");
 }
