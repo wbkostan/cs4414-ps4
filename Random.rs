@@ -15,7 +15,7 @@ use std::io::file_reader;
 #[cfg(target_os = "macos")]
 use std::path;
 
-use extra::bigint;
+use extra::{bigint, time};
 
 
 #[cfg(target_os = "win32", target_arch = "x86")]
@@ -133,19 +133,41 @@ pub fn srandN(n: uint) -> Option<bigint::BigUint>{
 	return Some(bigint::BigUint::new(big_digs))
 }
 
+static THRESHHOLD: uint = 2;
+static BITCOUNT: uint = 64;
+
 fn main() {
-	let wnum = wrand();
-	let snum = srand();
-	let wnumn = wrandN(64 as uint);
-	let snumn = srandN(64 as uint);
-	println(wnum.to_str());
-	match snum{
-		Some(x) => {println(x.to_str());},
-		None => {println("None");},
+	let mut i = THRESHHOLD;
+	let mut avg_times: ~[bigint::BigUint] = ~[bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0)];
+
+	while (i != 0){
+		/* take timings */
+		let t1 = time::precise_time_ns();
+		let wnum = wrand();
+		let t2 = time::precise_time_ns();
+		let snum = srand();
+		let t3 = time::precise_time_ns();
+		let wnumn = wrandN(BITCOUNT);
+		let t4 = time::precise_time_ns();
+		let snumn = srandN(BITCOUNT);
+		let t5 = time::precise_time_ns();
+		
+		/*add to running sums*/
+		avg_times[0] = avg_times[0] + bigint::BigUint::from_uint((t2 - t1) as uint);
+		avg_times[1] = avg_times[1] + bigint::BigUint::from_uint((t3 - t2) as uint);
+		avg_times[2] = avg_times[2] + bigint::BigUint::from_uint((t4 - t3) as uint);
+		avg_times[3] = avg_times[3] + bigint::BigUint::from_uint((t5 - t4) as uint);
+		
+		i -= 1;
 	}
-	println(wnumn.to_str());
-	match snumn{
-		Some(x) => {println(x.to_str());},
-		None => {println("None");},
+
+	for sum in avg_times.mut_iter(){
+		*sum = (*sum/bigint::BigUint::from_uint(THRESHHOLD as uint));
 	}
+	
+	println("Averages over " + THRESHHOLD.to_str() + " iterations:");
+	println("Average time for 32-bit weak random: " + avg_times[0].to_str());
+	println("Average time for 32-bit strong random: " + avg_times[1].to_str());
+	println("Average time for " + BITCOUNT.to_str() + "-bit weak random: " + avg_times[2].to_str());
+	println("Average time for " + BITCOUNT.to_str() + "-bit strong random: " + avg_times[3].to_str());
 }
