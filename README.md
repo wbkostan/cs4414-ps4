@@ -32,9 +32,12 @@ only available on Intel Ivy Bridge processors.
 
 **Data:**
 
-![Variable-Bit Timings](https://github.com/wbkostan/cs4414-ps4/blob/master/img/VariableBitChart.PNG "Variable-Bit Timings")
+Variable-Bit Timings
+<img src="https://github.com/wbkostan/cs4414-ps4/blob/master/img/VariableBitChart.PNG">
 
-![32-bit Timings](https://github.com/wbkostan/cs4414-ps4/blob/master/img/32BitAll.PNG "32-Bit Timings"]
+32-Bit Timings
+<img src="https://github.com/wbkostan/cs4414-ps4/blob/master/img/32BitAll.PNG">
 
-![32-bit Zoomed](https://github.com/wbkostan/cs4414-ps4/blob/master/img/32BitRelevent.PNG "32-Bit Zoomed In"]
+32-Bit Zoomed In
+<img src="https://github.com/wbkostan/cs4414-ps4/blob/master/img/32BitRelevent.PNG">
 
