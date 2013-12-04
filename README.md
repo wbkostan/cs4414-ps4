@@ -31,9 +31,10 @@ srand() functions are composed of the Intel RdRand assembly instruction,
 only available on Intel Ivy Bridge processors.
 
 **Data:**
-![Variable-Bit Timings](/img/VariableBitChar.png "Variable-Bit Timings")
 
-![32-bit Timings](/img/32BitAll.png "32-Bit Timings"]
+![Variable-Bit Timings](img/VariableBitChar.png "Variable-Bit Timings")
 
-![32-bit Zoomed](/img/32BitRelevant.png "32-Bit Zoomed In"]
+![32-bit Timings](img/32BitAll.png "32-Bit Timings"]
+
+![32-bit Zoomed](img/32BitRelevant.png "32-Bit Zoomed In"]
 
