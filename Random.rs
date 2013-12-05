@@ -157,6 +157,7 @@ pub fn randN(n: uint) -> bigint::BigUint {
 
 static THRESHHOLD: uint = 2;
 static BITCOUNT: uint = 64;
+static CONV_FACTOR: f64 = 1.0/1000000.0;
 
 fn main() {
         let mut i = THRESHHOLD;
@@ -183,14 +184,15 @@ fn main() {
                 if(snum == 0 || snumn.is_none()){fail = true;}
 
                 /*add to running sums*/
-                avg_times[0] = avg_times[0] + ((t2 - t1) as f64);
-                avg_times[1] = avg_times[1] + ((t3 - t2) as f64);
-                avg_times[2] = avg_times[2] + ((t4 - t3) as f64);
-                avg_times[3] = avg_times[3] + ((t5 - t4) as f64);
-                avg_times[4] = avg_times[4] + ((t6 - t5) as f64);
-		avg_times[5] = avg_times[5] + ((t7 - t6) as f64);
+                avg_times[0] = avg_times[0] + (((t2 - t1) as f64) * CONV_FACTOR);
+                avg_times[1] = avg_times[1] + (((t3 - t2) as f64) * CONV_FACTOR);
+                avg_times[2] = avg_times[2] + (((t4 - t3) as f64) * CONV_FACTOR);
+                avg_times[3] = avg_times[3] + (((t5 - t4) as f64) * CONV_FACTOR);
+                avg_times[4] = avg_times[4] + (((t6 - t5) as f64) * CONV_FACTOR);
+		avg_times[5] = avg_times[5] + (((t7 - t6) as f64) * CONV_FACTOR);
 
 		if(THRESHHOLD < 10){
+			println("");
 			println("wrand: " + wnum.to_str());
 			println("wrandN: " + wnumn.to_str());
 			println("snum: " + snum.to_str());
@@ -201,6 +203,7 @@ fn main() {
                 
                 i -= 1;
         }
+	println("");
 
         for sum in avg_times.mut_iter(){
                 *sum = (*sum/(THRESHHOLD as f64));
