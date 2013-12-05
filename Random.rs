@@ -42,8 +42,7 @@ fn getOSEntropy() -> uint{
                 let res1 = CryptAcquireContextA(context, n, n, 1 as c_ulong, 4026531848 as c_ulong);
                 if(!res1){
                         let error = (GetLastError() as uint);
-                        println("Context bailed");
-                        return error;
+                        return 0;
                 }
                 
                 let ptr: *c_void = malloc(8 as size_t) as *c_void;
@@ -53,8 +52,7 @@ fn getOSEntropy() -> uint{
                         free(ptr);
                         CryptReleaseContext(context, 0);
                         free(context);
-                        println("Couldn't Gen");
-                        return error;
+                        return 0;
                 }
                 else{
                         let package = (ptr as uint);
