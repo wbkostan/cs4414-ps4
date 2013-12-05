@@ -143,12 +143,26 @@ pub fn srandN(n: uint) -> Option<bigint::BigUint>{
         return Some(bigint::BigUint::new(big_digs))
 }
 
+pub fn randN(n: uint) -> bigint::BigUint {
+	let mut iterations = (n/32) as uint;
+        let mut big_digs: ~[bigint::BigDigit] = ~[];
+        while (iterations != 0){
+                let num: uint = rand::random();
+                let mut res = Some(num);
+               	let digs = bigint::BigDigit::from_uint(num);
+              	big_digs.push(digs.first());
+              	big_digs.push(digs.second());
+                iterations -= 1;
+        }
+        return bigint::BigUint::new(big_digs);
+}
+
 static THRESHHOLD: uint = 2;
 static BITCOUNT: uint = 64;
 
 fn main() {
         let mut i = THRESHHOLD;
-        let mut avg_times: ~[bigint::BigUint] = ~[bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0), bigint::BigUint::from_uint(0)];
+        let mut avg_times: ~[f64] = ~[0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 
         let mut fail = false;
 
@@ -165,30 +179,42 @@ fn main() {
                 let t5 = time::precise_time_ns();
                 let bench1: uint = rand::random();
                 let t6 = time::precise_time_ns();
+		let bench2 = randN(BITCOUNT);
+		let t7 = time::precise_time_ns();
                 
                 if(snum == 0 || snumn.is_none()){fail = true;}
 
                 /*add to running sums*/
-                avg_times[0] = avg_times[0] + bigint::BigUint::from_uint((t2 - t1) as uint);
-                avg_times[1] = avg_times[1] + bigint::BigUint::from_uint((t3 - t2) as uint);
-                avg_times[2] = avg_times[2] + bigint::BigUint::from_uint((t4 - t3) as uint);
-                avg_times[3] = avg_times[3] + bigint::BigUint::from_uint((t5 - t4) as uint);
-                avg_times[4] = avg_times[4] + bigint::BigUint::from_uint((t6 - t5) as uint);
+                avg_times[0] = avg_times[0] + ((t2 - t1) as f64);
+                avg_times[1] = avg_times[1] + ((t3 - t2) as f64);
+                avg_times[2] = avg_times[2] + ((t4 - t3) as f64);
+                avg_times[3] = avg_times[3] + ((t5 - t4) as f64);
+                avg_times[4] = avg_times[4] + ((t6 - t5) as f64);
+		avg_times[5] = avg_times[5] + ((t7 - t6) as f64);
+
+		if(THRESHHOLD < 10){
+			println("wrand: " + wnum.to_str());
+			println("wrandN: " + wnumn.to_str());
+			println("snum: " + snum.to_str());
+			println("snumn: " + snumn.to_str());
+			println("rand: " + bench1.to_str());
+			println("randN: " + bench2.to_str());
+		}
                 
                 i -= 1;
         }
 
         for sum in avg_times.mut_iter(){
-                *sum = (*sum/bigint::BigUint::from_uint(THRESHHOLD as uint));
+                *sum = (*sum/(THRESHHOLD as f64));
         }
         
         println("Averages over " + THRESHHOLD.to_str() + " iterations:");
-        println("Average time for 32-bit weak random: " + avg_times[0].to_str());
-        if(!fail){println("Average time for 32-bit strong random: " + avg_times[1].to_str());}
+        println("Average time for 32-bit weak random: " + std::f64::to_str_digits(avg_times[0], 6));
+        if(!fail){println("Average time for 32-bit strong random: " + std::f64::to_str_digits(avg_times[1], 6));}
         else{println("Average time for 32-bit strong random: N/A");}
-        println("Average time for " + BITCOUNT.to_str() + "-bit weak random: " + avg_times[2].to_str());
-        if(!fail){println("Average time for " + BITCOUNT.to_str() + "-bit strong random: " + avg_times[3].to_str());}
+        println("Average time for " + BITCOUNT.to_str() + "-bit weak random: " + std::f64::to_str_digits(avg_times[2], 6));
+        if(!fail){println("Average time for " + BITCOUNT.to_str() + "-bit strong random: " + std::f64::to_str_digits(avg_times[3], 6));}
         else{println("Average time for " + BITCOUNT.to_str() + "-bit strong random: N/A");}
-        println("Benchmark for 32-bit random: " + avg_times[4].to_str());
-        println("Benchmark for " + BITCOUNT.to_str() + "-bit random: N/A (in Rust)");
+        println("Benchmark for 32-bit random: " + std::f64::to_str_digits(avg_times[4], 6));
+        println("Benchmark for " + BITCOUNT.to_str() + "-bit random: " + std::f64::to_str_digits(avg_times[5], 6));
 }
